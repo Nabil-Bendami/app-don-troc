@@ -416,12 +416,14 @@ class FirestoreService {
       return _firestore
           .collection(_postsCollection)
           .where('userId', isEqualTo: userId)
-          .orderBy('createdAt', descending: true)
           .snapshots()
           .map((snapshot) {
-            return snapshot.docs
+            final posts = snapshot.docs
                 .map((doc) => PostModel.fromJson(doc.data()))
                 .toList();
+            // Sort locally by createdAt in descending order
+            posts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+            return posts;
           });
     } catch (e) {
       rethrow;
