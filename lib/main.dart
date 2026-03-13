@@ -3,14 +3,21 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart';
 import 'config/index.dart';
+import 'services/index.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
   /// Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  /// Seed demo data if posts collection is empty
+  try {
+    final firestoreService = FirestoreService();
+    await firestoreService.seedDemoPosts();
+  } catch (e) {
+    debugPrint('Error seeding demo posts: $e');
+  }
 
   runApp(const ProviderScope(child: MyApp()));
 }

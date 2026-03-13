@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Allow anyone to read items (public feed)
+    match /items/{document=**} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+    }
+    
+    // Allow anyone to read posts (public feed)
+    match /posts/{document=**} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+    }
+    
+    // Chats - users can only access their own chats
+    match /chats/{chatId} {
+      // Check if user is participant
+      allow read, update: if request.auth != null && 
+        request.auth.uid in resource.data.userIds;
+      allow create: if request.auth != null;
+      allow delete: if request.auth != null && 
+        request.auth.uid in resource.data.userIds;
+      
+      // Messages subcollection
+      match /messages/{messageId} {
+        allow read: if request.auth != null &&
+          request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.userIds;
+        allow create: if request.auth != null &&
+          request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.userIds;
+        allow update, delete: if request.auth != null && 
+          request.auth.uid == resource.data.senderId;
+      }
+    }
+    
+    // Users - publicly readable profiles
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if request.auth != null && 
+        request.auth.uid == userId;
+      allow delete: if request.auth != null && 
+        request.auth.uid == userId;
+    }
+  }
+}

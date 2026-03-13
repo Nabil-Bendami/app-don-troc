@@ -57,6 +57,27 @@ final routerProvider = Provider<GoRouter>((ref) {
             pageBuilder: (context, state) =>
                 const MaterialPage(child: AddItemScreen()),
           ),
+          GoRoute(
+            path: 'my-posts',
+            pageBuilder: (context, state) =>
+                const MaterialPage(child: MyPostsScreen()),
+          ),
+          GoRoute(
+            path: 'create-post',
+            pageBuilder: (context, state) =>
+                const MaterialPage(child: CreatePostScreen()),
+          ),
+          GoRoute(
+            path: 'posts',
+            pageBuilder: (context, state) =>
+                const MaterialPage(child: PostsFeedScreen()),
+          ),
+          GoRoute(
+            path: 'post/:postId',
+            pageBuilder: (context, state) => MaterialPage(
+              child: PostDetailScreen(postId: state.pathParameters['postId']!),
+            ),
+          ),
         ],
       ),
       GoRoute(

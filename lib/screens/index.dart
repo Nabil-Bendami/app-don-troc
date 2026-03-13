@@ -8,3 +8,7 @@ export 'chat_screen.dart';
 export 'messages_screen.dart';
 export 'activity_screen.dart';
 export 'profile_screen.dart';
+export 'my_posts_screen.dart';
+export 'create_post_screen.dart';
+export 'posts_feed_screen.dart';
+export 'post_detail_screen.dart';

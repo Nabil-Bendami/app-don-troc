@@ -1,5 +1,5 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/index.dart';
@@ -57,15 +57,21 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
                           onPageChanged: (index) =>
                               setState(() => _currentImageIndex = index),
                           itemCount: item.imageUrls.length,
-                          itemBuilder: (context, index) => CachedNetworkImage(
-                            imageUrl: item.imageUrls[index],
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                            errorWidget: (context, url, error) =>
-                                const Icon(Icons.image_not_supported),
-                          ),
+                          itemBuilder: (context, index) {
+                            final imagePath = item.imageUrls[index];
+                            final file = File(imagePath);
+                            if (file.existsSync()) {
+                              return Image.file(
+                                file,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Icon(Icons.image_not_supported);
+                                },
+                              );
+                            } else {
+                              return const Icon(Icons.image_not_supported);
+                            }
+                          },
                         ),
                       )
                     else
@@ -232,12 +238,14 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
                             children: [
                               CircleAvatar(
                                 radius: Constants.avatarRadius,
-                                backgroundImage: item.userPhotoUrl != null
-                                    ? CachedNetworkImageProvider(
-                                        item.userPhotoUrl!,
-                                      )
+                                backgroundImage:
+                                    item.userPhotoUrl != null &&
+                                        File(item.userPhotoUrl!).existsSync()
+                                    ? FileImage(File(item.userPhotoUrl!))
                                     : null,
-                                child: item.userPhotoUrl == null
+                                child:
+                                    item.userPhotoUrl == null ||
+                                        !File(item.userPhotoUrl!).existsSync()
                                     ? const Icon(Icons.person)
                                     : null,
                               ),

@@ -13,8 +13,8 @@ class SplashScreen extends StatelessWidget {
           children: [
             /// App icon/logo
             Container(
-              width: 100,
-              height: 100,
+              width: 120,
+              height: 120,
               decoration: BoxDecoration(
                 color: AppTheme.primaryColor,
                 borderRadius: BorderRadius.circular(24),

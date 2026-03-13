@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/index.dart';
 
 class AuthService {
@@ -166,6 +165,18 @@ class AuthService {
     }
   }
 
+  /// Update user model (complete user object update)
+  Future<void> updateUserModel(UserModel user) async {
+    try {
+      await _firestore.collection('users').doc(user.uid).set(
+            user.toJson(),
+            SetOptions(merge: true),
+          );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   /// Sign out
   Future<void> signOut() async {
     try {
@@ -217,6 +228,3 @@ class AuthService {
     }
   }
 }
-
-// Riverpod provider for AuthService
-final authServiceProvider = Provider<AuthService>((ref) => AuthService());

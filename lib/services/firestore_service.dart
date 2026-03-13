@@ -8,6 +8,7 @@ class FirestoreService {
   static const String _itemsCollection = 'items';
   static const String _chatsCollection = 'chats';
   static const String _messagesCollection = 'messages';
+  static const String _postsCollection = 'posts';
   static const int _pageSize = 10;
 
   /// Create a new item
@@ -107,10 +108,7 @@ class FirestoreService {
           .snapshots()
           .map((snapshot) {
             return snapshot.docs
-                .map(
-                  (doc) =>
-                      ItemModel.fromJson(doc.data() as Map<String, dynamic>),
-                )
+                .map((doc) => ItemModel.fromJson(doc.data()))
                 .toList();
           });
     } catch (e) {
@@ -129,10 +127,7 @@ class FirestoreService {
           .snapshots()
           .map((snapshot) {
             return snapshot.docs
-                .map(
-                  (doc) =>
-                      ItemModel.fromJson(doc.data() as Map<String, dynamic>),
-                )
+                .map((doc) => ItemModel.fromJson(doc.data()))
                 .toList();
           });
     } catch (e) {
@@ -220,6 +215,22 @@ class FirestoreService {
     }
   }
 
+  /// Get chat by ID
+  Future<ChatModel?> getChat(String chatId) async {
+    try {
+      final doc = await _firestore
+          .collection(_chatsCollection)
+          .doc(chatId)
+          .get();
+      if (doc.exists) {
+        return ChatModel.fromJson(doc.data() as Map<String, dynamic>);
+      }
+    } catch (e) {
+      rethrow;
+    }
+    return null;
+  }
+
   /// Get chat messages
   Stream<List<MessageModel>> getChatMessages(String chatId) {
     try {
@@ -277,6 +288,158 @@ class FirestoreService {
         'lastMessageSenderId': senderId,
         'updatedAt': DateTime.now(),
       });
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Seed demo posts if collection is empty
+  Future<void> seedDemoPosts() async {
+    try {
+      final postsSnapshot = await _firestore
+          .collection(_postsCollection)
+          .limit(1)
+          .get();
+
+      /// Only seed if collection is empty
+      if (postsSnapshot.docs.isEmpty) {
+        const uuid = Uuid();
+
+        final demoPosts = [
+          PostModel(
+            id: uuid.v4(),
+            title: 'Beautiful vintage bike for sale',
+            description:
+                'Classic 1970s road bike in excellent condition. Fully restored and ready to ride. Great for collectors and enthusiasts!',
+            image: null,
+            userId: 'demo_user_1',
+            userName: 'Alex Johnson',
+            userPhotoUrl: null,
+            createdAt: DateTime.now().subtract(const Duration(days: 2)),
+          ),
+          PostModel(
+            id: uuid.v4(),
+            title: 'Gaming laptop - barely used',
+            description:
+                'High-end gaming laptop with RTX 3080. Purchased last year but barely used. Comes with original box and charger. Looking to upgrade.',
+            image: null,
+            userId: 'demo_user_2',
+            userName: 'Sarah Williams',
+            userPhotoUrl: null,
+            createdAt: DateTime.now().subtract(const Duration(days: 1)),
+          ),
+          PostModel(
+            id: uuid.v4(),
+            title: 'Antique wooden desk',
+            description:
+                'Beautiful hand-crafted wooden desk from the 1950s. Solid oak with original hardware and patina. Perfect statement piece for any office.',
+            image: null,
+            userId: 'demo_user_1',
+            userName: 'Alex Johnson',
+            userPhotoUrl: null,
+            createdAt: DateTime.now().subtract(const Duration(hours: 12)),
+          ),
+          PostModel(
+            id: uuid.v4(),
+            title: 'Camera equipment bundle',
+            description:
+                'Professional camera equipment including Canon EOS R5, RF lenses, tripod, and lighting kit. Switching to mirrorless, so letting go of DSLR gear.',
+            image: null,
+            userId: 'demo_user_3',
+            userName: 'Mike Chen',
+            userPhotoUrl: null,
+            createdAt: DateTime.now().subtract(const Duration(hours: 6)),
+          ),
+          PostModel(
+            id: uuid.v4(),
+            title: 'Electric scooter - new condition',
+            description:
+                'Recently purchased Xiaomi Pro 2 electric scooter. Excellent for urban commuting. Low mileage, all features working perfectly.',
+            image: null,
+            userId: 'demo_user_2',
+            userName: 'Sarah Williams',
+            userPhotoUrl: null,
+            createdAt: DateTime.now().subtract(const Duration(hours: 3)),
+          ),
+        ];
+
+        /// Add each demo post to Firestore
+        for (final post in demoPosts) {
+          await _firestore
+              .collection(_postsCollection)
+              .doc(post.id)
+              .set(post.toJson());
+        }
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Add a new post
+  Future<PostModel> addPost({
+    required String title,
+    required String description,
+    String? image,
+    required String userId,
+    required String userName,
+    String? userPhotoUrl,
+  }) async {
+    try {
+      const uuid = Uuid();
+      final postId = uuid.v4();
+
+      final postModel = PostModel(
+        id: postId,
+        title: title,
+        description: description,
+        image: image,
+        userId: userId,
+        userName: userName,
+        userPhotoUrl: userPhotoUrl,
+        createdAt: DateTime.now(),
+      );
+
+      await _firestore
+          .collection(_postsCollection)
+          .doc(postId)
+          .set(postModel.toJson());
+      return postModel;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Get posts by user (filtered by userId)
+  Stream<List<PostModel>> getUserPosts(String userId) {
+    try {
+      return _firestore
+          .collection(_postsCollection)
+          .where('userId', isEqualTo: userId)
+          .orderBy('createdAt', descending: true)
+          .snapshots()
+          .map((snapshot) {
+            return snapshot.docs
+                .map((doc) => PostModel.fromJson(doc.data()))
+                .toList();
+          });
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Get all posts (for feed)
+  Stream<List<PostModel>> getAllPosts() {
+    try {
+      return _firestore
+          .collection(_postsCollection)
+          .orderBy('createdAt', descending: true)
+          .snapshots()
+          .map((snapshot) {
+            return snapshot.docs
+                .map((doc) => PostModel.fromJson(doc.data()))
+                .toList();
+          });
     } catch (e) {
       rethrow;
     }
