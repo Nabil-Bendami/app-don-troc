@@ -168,7 +168,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     const custom.LoadingWidget(message: 'Loading messages...'),
                 error: (error, stack) {
                   // FALLBACK TO MOCK DATA ON ERROR (instead of showing error widget)
-                  final mockMessages = MockDataGenerator.generateSampleMessages(widget.chatId);
+                  final mockMessages = MockDataGenerator.generateSampleMessages(
+                    widget.chatId,
+                  );
                   if (mockMessages.isNotEmpty) {
                     return ListView.builder(
                       controller: _scrollController,

@@ -112,7 +112,8 @@ class ProfileScreen extends ConsumerWidget {
 
                         /// Edit Profile Button
                         ElevatedButton.icon(
-                          onPressed: () => _showEditProfileDialog(context, ref, user),
+                          onPressed: () =>
+                              _showEditProfileDialog(context, ref, user),
                           icon: const Icon(Icons.edit),
                           label: const Text('Edit Profile'),
                           style: ElevatedButton.styleFrom(
@@ -274,7 +275,11 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  void _showEditProfileDialog(BuildContext context, WidgetRef ref, UserModel user) {
+  void _showEditProfileDialog(
+    BuildContext context,
+    WidgetRef ref,
+    UserModel user,
+  ) {
     final nameController = TextEditingController(text: user.name);
     final locationController = TextEditingController(text: user.location ?? '');
 
@@ -315,19 +320,21 @@ class ProfileScreen extends ConsumerWidget {
                 final authService = ref.read(authServiceProvider);
                 final updatedUser = user.copyWith(
                   name: nameController.text.trim(),
-                  location: locationController.text.trim().isEmpty 
-                    ? null 
-                    : locationController.text.trim(),
+                  location: locationController.text.trim().isEmpty
+                      ? null
+                      : locationController.text.trim(),
                 );
                 await authService.updateUserModel(updatedUser);
-                
+
                 // Invalidate the currentUserProvider to refresh UI
                 ref.invalidate(currentUserProvider);
-                
+
                 if (context.mounted) {
                   Navigator.pop(dialogContext);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Profile updated successfully!')),
+                    const SnackBar(
+                      content: Text('Profile updated successfully!'),
+                    ),
                   );
                 }
               } catch (e) {

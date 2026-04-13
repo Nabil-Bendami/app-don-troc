@@ -36,7 +36,7 @@ class ItemCard extends StatelessWidget {
                       backgroundColor: AppTheme.primaryColor,
                       backgroundImage:
                           item.userPhotoUrl != null &&
-                            item.userPhotoUrl!.isNotEmpty &&
+                              item.userPhotoUrl!.isNotEmpty &&
                               File(item.userPhotoUrl!).existsSync()
                           ? FileImage(File(item.userPhotoUrl!))
                           : null,
@@ -63,17 +63,14 @@ class ItemCard extends StatelessWidget {
                         children: [
                           Text(
                             item.userName,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall
+                            style: Theme.of(context).textTheme.titleSmall
                                 ?.copyWith(fontWeight: FontWeight.bold),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            DateFormat('MMM dd, HH:mm')
-                                .format(item.createdAt),
+                            DateFormat('MMM dd, HH:mm').format(item.createdAt),
                             style: Theme.of(context).textTheme.labelSmall,
                           ),
                         ],
@@ -87,10 +84,9 @@ class ItemCard extends StatelessWidget {
               /// Title
               Text(
                 item.title,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(fontWeight: FontWeight.w600),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -150,9 +146,7 @@ class ItemCard extends StatelessWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: Theme.of(context).textTheme.labelSmall
-                                  ?.copyWith(
-                                    color: AppTheme.secondaryColor,
-                                  ),
+                                  ?.copyWith(color: AppTheme.secondaryColor),
                             ),
                           ),
                         ],
@@ -166,4 +160,5 @@ class ItemCard extends StatelessWidget {
         ),
       ),
     );
-  }}
+  }
+}

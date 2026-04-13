@@ -168,10 +168,10 @@ class AuthService {
   /// Update user model (complete user object update)
   Future<void> updateUserModel(UserModel user) async {
     try {
-      await _firestore.collection('users').doc(user.uid).set(
-            user.toJson(),
-            SetOptions(merge: true),
-          );
+      await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .set(user.toJson(), SetOptions(merge: true));
     } catch (e) {
       rethrow;
     }
